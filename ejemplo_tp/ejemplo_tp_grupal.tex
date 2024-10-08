@@ -1,0 +1,323 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
+
+
+\titulo{Trabajo Práctico Nro 1: En busqueda del Camino}
+\subtitulo{Especificación y WP}
+
+\fecha{\today}
+
+\materia{Algoritmos y Estructuras de Datos}
+\grupo{punto\&\&coma}
+
+\integrante{Oro, Iván}{667/24}{ivanoro0701@hotmail.com}
+\integrante{Obregón, María}{706/24}{mobregonds@gmail.com}
+\integrante{Alvarez Bertoya, Lautaro}{666/24}{lalvarezbertoya@gmail.com}
+\integrante{Varela, Tomás}{438/24}{tlvarela2005@gmail.com }
+
+
+
+\begin{document}
+
+\maketitle{}
+\section{Especificación}
+\subsection*{Predicados de uso general}
+\pred{tieneHabitantes}{ciudad:\TLista{Ciudad}}{ciudad.habitantes\geq 0}
+\pred{tieneCamino}{distancias:\TLista{\TLista{\ent}}, desde:\ent , hasta:\ent  }{\existe[unalinea]{lista}{\TLista{\ent}}{\paraTodo[unalinea]{i}{\ent}{1\leq i< |lista| \implicaLuego ((lista[0]=desde)\land(lista[|lista|-1]=hasta)\\ \land(distancias[lista[i]][lista[i-1]]>0)\land \paraTodo[unalinea]{a}{\ent}{0\leq a<|lista| \implicaLuego 0 \leq lista[a] < |distancias|) }}}}
+
+\pred{esSimetrica}{matriz: \TLista{\TLista{\ent}}}{\paraTodo [unalinea]{i}{\ent}{0\leq i < |matriz| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0\leq j<|matriz[j]|\implicaLuego matriz[i][j] = matriz[j][i]}}}
+
+\pred{esCuadrada}{matriz: \TLista{\TLista{\ent}}}{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|matriz| \implicaLuego |matriz| = |matriz[i]|}}
+
+\subsection {grandesCiudades}
+A partir de una lista de ciudades, devuelve aquellas que tienen más de 50.000 habitantes.
+\vspace{0.2cm}
+\begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad} }{\TLista{Ciudad}}
+	\requiere{\paraTodo[unalinea]{i}{\ent}{0\leq i < |ciudades| \implicaLuego tieneHabitantes(ciudades[i])}}
+	\asegura{\paraTodo [unalinea]{a}{\ent}{0 \leq a<|res| \implicaLuego (res[a]  \in  ciudades)}}
+	\asegura{\paraTodo [unalinea]{j}{\ent}{0 \leq j<|ciudades| \yLuego tieneMasDe50k(ciudades[j])  \implicaLuego ciudades[j])  \in  res}}
+	
+	
+	\vspace{0.2cm}
+	
+\end{proc}
+\pred{tieneMasDe50k}{ciudad:\TLista{Ciudad} }{ciudad.habitantes >50000} 
+
+
+\subsection {sumaDeHabitantes}
+Por cuestiones de planificación urbana, las ciudades registran sus habitantes mayores de edad
+por un lado y menores de edad por el otro. Dadas dos listas de ciudades del mismo largo con los mismos nombres, una
+con sus habitantes mayores y otra con sus habitantes menores, este procedimiento debe devolver una lista de ciudades
+con la cantidad total de sus habitantes.
+\vspace{0.3cm}
+\begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad} }{\TLista{Ciudad}}
+	\requiere{mismoLargo(menoresDeCiudades, mayoresDeCiudades)}
+	\requiere{noTieneRepetidos(menoresDeCiudades) \land  noTieneRepetidos(mayoresDeCiudades) }
+	\requiere{\paraTodo[unalinea]{i}{\ent}{0\leq i < |menoresDeCiudades| \implicaLuego tieneHabitantes(menoresDeCiudades[i]) \land \\ 			tieneHabitantes(mayoresDeCiudades[i]) }}
+
+	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|menoresDeCiudades| \implicaLuego \existe [unalinea]{j}{\ent}{0 \leq j<|mayoresDeCiudades| \yLuego 	\\		             menoresDeCiudades[i].nombre = mayoresDeCiudades[j].nombre}}}
+\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|mayoresDeCiudades| \implicaLuego \existe [unalinea]{j}{\ent}{0 \leq j<|menoresDeCiudades| \yLuego 	\\		             mayoresDeCiudades[i].nombre = menoresDeCiudades[j].nombre}}}
+	\asegura{mismoLargo(res, menoresDeCiudades) \land (\paraTodo [unalinea]{a}{\ent}{0 \leq a<|menoresDeCiudades| \implicaLuego \\ \existe [unalinea]{b}{\ent}{0 \leq b<|res| \yLuego 			             res[b].nombre = menoresDeCiudades[a].nombre)}}}
+	\asegura{\paraTodo [unalinea]{m}{\ent}{0 \leq m<|menoresDeCiudades| \implicaLuego \existe [unalinea]{n}{\ent}{0 \leq n<|mayoresDeCiudades|   \ \yLuego 			             menoresDeCiudades[m].nombre = mayoresDeCiudades[n].nombre \ \yLuego \\\ agruparHabitantes(menoresDeCiudades[m], mayoresDeCiudades[n]) \in res}}}
+	\vspace{0.3cm}
+
+
+\end{proc}
+	\pred{mismoLargo}{secuencia1:\TLista{Ciudad}, secuencia2:\TLista{Ciudad} }{|secuencia1|=|secuencia2|} 
+\vspace{0.2cm}
+\pred{noTieneRepetidos}{secuencia1:\TLista{Ciudad}}{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|secuencia1| \implicaLuego \neg \existe [unalinea]{j}{\ent}{0 \leq j<|secuencia1| \land i\neq j \yLuego \\ secuencia1[i] = secuencia1[j]}}} 
+\vspace{0.2cm}
+\aux{agruparHabitantes}{menoresDeCiudades: \ensuremath{Ciudad \langle String, \ent \rangle},mayoresDeCiudades:\ensuremath{Ciudad \langle String, \ent \rangle}  }{\ensuremath{Ciudad \langle String, \ent \rangle} \\}{\langle menoresDeCiudades.nombre, (menoresDeCiudades.habitantes+mayoresDeCiudades.habitantes)\rangle}
+	\vspace{0.2cm}
+\subsection {hayCamino}
+ Un mapa de ciudades está conformada por ciudades y caminos que unen a algunas de ellas. A partir de
+este mapa, podemos definir las distancias entre ciudades como una matriz donde cada celda i, j representa la distancia
+entre la ciudad i y la ciudad j. Una distancia de 0 equivale a no haber camino directo entre i y j. Notar que
+la distancia de una ciudad hacia sí misma es cero y la distancia entre A y B es la misma que entre B y A.
+Dadas dos ciudades y una matriz de distancias, se pide determinar si existe un camino entre ambas ciudades.
+\vspace{0.2cm}
+\begin{proc}{hayCamino}{\In distancias: \TLista{\TLista{\ent}}, \In desde:\ent , \In hasta:\ent }{Bool}
+	\requiere{|distancias|\geq2}
+	\requiere{esCuadrada(distancias)}
+	\requiere{esSimetrica(distancias)}
+	\requiere{0\leq desde < |distancias| \land 0 \leq hasta < |distancias|}
+	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|distancias| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|distancias[i]| \implicaLuego 	\\		             (distancias[i][j] \geq0)}}}
+	\asegura{res = True \Iff tieneCaminoDirecto(distancia, desde, hasta) \lor tieneCamino(distancia, desde, hasta)}
+
+	
+\vspace{0.2cm}
+	
+\end{proc}
+\pred{tieneCaminoDirecto}{distancias:\TLista{\TLista{\ent}}, desde:\ent , hasta:\ent  }{distancias[desde][hasta] > 0} 
+\vspace{0.2cm}
+
+
+\vspace{0.2cm}
+
+\subsection {cantidadCaminosNSaltos}
+Dentro del contexto de redes informáticas, nos interesa contar la cantidad de “saltos”
+que realizan los paquetes de datos, donde un salto se define como pasar por un nodo.
+Así como definimos la matriz de distancias, podemos definir la matriz de conexión entre nodos, donde cada celda i, j
+tiene un 1 si hay un único camino a un salto de distancia entre el nodo i y el nodo j, y un 0 en caso contrario. En este
+caso, se trata de una matriz de conexión de orden 1, ya que indica cuáles pares de nodos poseen 1 camino entre ellos a
+1 salto de distancia.
+Dada la matriz de conexi´on de orden 1, este procedimineto debe obtener aquella de orden n que indica cu´antos caminos
+de n saltos hay entre los distintos nodos. Notar que la multiplicación de una matriz de conexión de orden 1 consigo
+misma nos da la matriz de conexión de orden 2, y así sucesivamente.
+\vspace{0.3cm}
+\begin{proc}{cantidadCaminosNSaltos}{\Inout conexion: \TLista{\TLista{\ent}}, \In n:\ent }{}
+	\requiere{|conexion|\geq2 \land conexion=conexion_0}
+	\requiere{n>1}
+	\requiere{esCuadrada(conexion)}
+	\requiere{esSimetrica(conexion)}
+	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|conexion| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|conexion[i]| \implicaLuego 	\\		             (conexion[i][j] \in \{0,1\})}}}
+	\asegura{\existe[unalinea]{listaMatrices}{\TLista{\TLista{\TLista{\ent}}}}{(|listaMatrices|=n)\land \paraTodo [unalinea]{q}{\ent}{1\leq q < |ListaMatrices| \implicaLuego     \\   (|listaMatrices[q]| = |conexion_0|) \land (listaMatrices[0] = conexion_0) \land \paraTodo[unalinea]{i}{\ent}{0\leq i<|conexion_0| \implicaLuego      \\       \paraTodo[unalinea]{j}{\ent}{0\leq j <|conexion_0| \implicaLuego listaMatrices[q] = \sum\limits_{k=0}^{|conexion_0|-1} conexion_0[k][i] * listaMatrices[q-1][j][k] }} }} \land \paraTodo[unalinea]{a}{\ent}{0\leq a<|conexion| \implicaLuego \paraTodo[unalinea]{b}{\ent}{0\leq b<|conexion| \implicaLuego conexion[a][b]=listaMatrices[n-1][a][b]}}}
+
+
+	\vspace{0.2cm}
+	
+\end{proc}
+\subsection {caminoMínimo}
+Dada una matriz de distancias, una ciudad de origen y una ciudad de destino, este procedimiento
+debe devolver la lista de ciudades que conforman el camino con menor distancia entre ambas. En caso de no existir un
+camino, se debe devolver una lista vacía.
+
+\vspace{0.2cm}
+\begin{proc}{caminoMínimo}{\In distancias: \TLista{\TLista{\ent}}, \In origen:\ent , \In destino:\ent }{\TLista{\TLista{\ent}}}
+	\requiere{esCuadrada(distancias)}
+	\requiere{esSimetrica(distancias)}
+	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|distancias| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|distancias[i]| \implicaLuego 	\\		             (distancias[i][j] \geq0)}}}
+	\requiere{0\leq origen < |distancias| \land 0 \leq destino < |distancias|}
+
+	\asegura{res = [] \Iff  \neg tieneCamino(distancias, origen, destino)}
+	\asegura{res = lista \Iff  \existe[unalinea]{lista}{\TLista{\ent}}{esCamino(distancias, lista, origen, destino)\land \\ \paraTodo [unalinea]{listaAux}{\TLista{\ent}} {esCamino(distancias, listaAux, origen, destino) \implicaLuego \\ \sum\limits_{k=1}^{|lista|-1} distancias[lista[i]][lista[i-1]] \leq 	\sum\limits_{k=1}^{|listaAux|-1} distancias[listaAux[i]][listaAux[i-1]]   }} }
+
+
+	\vspace{0.2cm}
+	
+\end{proc}
+\pred{esCamino}{distancias: \TLista{\TLista{\ent}}, lista:\TLista{\ent}, origen:\ent , destino: \ent}{tieneCamino(distancias, origen, destino) \land \paraTodo [unalinea]{i}{\ent}{1\leq i<|lista| \implicaLuego distancia[lista[i]][lista[i-1]]>0}\land origen = lista[0]) \land (destino = lista [|lista|-1])}
+
+
+
+\section{Demostraciones de Correctitud}
+La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
+50.000 habitantes) y devuelve la cantidad total de habitantes. Dada la siguiente especificación:
+\begin{proc}{poblacionTotal}{\In ciudades: \TLista{Ciudad}}{\ent}
+	\requiere{\existe[unalinea]i\ent {0\leq i<|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \land \\
+    \paraTodo[unalinea]i{\ent}{0 \leq i<|conexion|} \implicaLuego {(|ciudades|[i].habitantes \geq 0) } \land \\ 
+    \paraTodo[unalinea]i{\ent}{\paraTodo[unalinea]j{\ent}{0 \leq i < j<ciudades[i].nombre \neq ciudades[j].nombre}}}
+    \asegura{res = \sum\limits_{i=0}^{|ciudades|-1} ciudades[i].habitantes}
+    
+	\vspace{0.1cm}
+
+\end{proc}
+\begin{lstlisting}
+res = 0;
+i = 0;
+while (i < ciudades.length) do
+	res := res + ciudades[i].habitantes;
+	i = i + 1
+endwhile
+	\end{lstlisting}
+\vspace{0.3cm}
+1. Demostrar que la implementación es correcta con respecto a la especificación \\
+ \\
+Lo probaremos por monotonía. Primero demostraremos la correctitud del ciclo del programa, es fundamental verificar tanto el Teorema del Invariante, que asegura que el invariante del ciclo se mantiene durante su ejecución, como el Teorema de Terminación, que garantiza que el ciclo finalizará. Estos teoremas son esenciales para determinar si la tripla de Hoare \{P\} S \{Q\} es correcta, donde \{P\} es la precondición, S el cuerpo del ciclo, y \{Q\} la postcondición. Solo si ambas propiedades se cumplen, podemos afirmar que el ciclo es correcto.\\ \\
+{$
+Pc = \{ res = 0 \land i = 0 \land (\existe[unalinea]i\ent {0\leq i<|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \land \\ \paraTodo[unalinea]i{\ent}{0 \leq i<|conexion|} \implicaLuego {(|ciudades|[i].habitantes \geq 0) } \land 
+    \paraTodo[unalinea]i{\ent}{\paraTodo[unalinea]j{\ent}{0 \leq i < j<ciudades[i].nombre \neq ciudades[j].nombre}})\}\\
+Qc = \{{res = \sum\limits_{i=0}^{|ciudades|-1}ciudades[j].habitantes}\}\\
+B = \{{i< |ciudades|}\}\\
+I = \{{ 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{i=0}^{i-1}ciudades[j].habitantes}\}\\
+Fv = {|ciudades| - i}$
+}
+
+\vspace{0.5cm}
+
+A) Pc \implica I \vspace{0.2cm}\\
+
+\[
+0 \leq i \leq |ciudades| \equiv 0 \leq 0 \leq |ciudades| 
+\vspace{0.2cm}
+\]
+\[
+res =\sum\limits_{i=0}^{i-1}ciudades[j].habitantes \equiv 0 \equiv
+ \vspace{0.2cm}\\
+\]
+\[
+res = \{\sum\limits_{i=0}^{0-1}ciudades[j].habitantes\} = 0 
+\vspace{0.5cm}\\
+\]
+\[
+Por \ lo \ tanto, Pc \implica I 
+\vspace{0.5cm}\\
+\]
+
+B)$\{I \land B \} S \{I\}$ \vspace{0.2cm}\\
+
+Dado que queremos demostrar que la tripla de Hoare es correcta, esto pasa si y solo si vemos que $(I \land B) \implica wp(S,I)$\\
+\[wp(S,I)\\\]
+\[wp(res := res + ciudades[i].habitantes, i := i+1, I)\\\]
+\[wp(res := res + ciudades[i].habitantes, wp(i := i+1, I))\\ \\\]
+\[wp (i := i+1, I) \equiv def(i+1) \yLuego 0 \leq i+1 \leq |ciudades| \yLuego res = \sum\limits_{i=0}^{i-1}ciudades[j].habitantes\\\]
+\[wp \equiv 0 \leq i \leq |ciudades| \land True \yLuego (0 \leq i+1 \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{(i+1)-1}ciudades[j].habitantes)\\ \]
+
+$Obs:$\\ 
+\[0 \leq i \leq |ciudades| \yLuego 0 \leq i+1 \leq |ciudades|\\  \]
+\[0 \leq i \leq |ciudades| \yLuego -1 \leq i \leq |ciudades|-1\\\]
+\[0 \leq i < |ciudades|\\ \]
+\[
+wp \equiv 0 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i}ciudades[j].habitantes\\\]
+\[wp(res := res + ciudades[i].habitantes, wp(i := i+1, I)) \equiv \\\]
+\[wp(res := res + ciudades[i].habitantes, 0 \leq i \leq |ciudades| \yLuego res = {\sum\limits_{j=0}^{i}ciudades[j].habitantes})\]
+\[wp(def(res+ciudades[i].habitantes) \yLuego 0 \leq i \leq |ciudades| \yLuego res = {\sum\limits_{j=0}^{i}ciudades[j].habitantes})\]
+\[wp(def(res) \land def(ciudades[i].habitantes) \yLuego 0 \leq i \leq |ciudades| \yLuego res+ciudades[i].habitantes = {\sum\limits_{j=0}^{i}ciudades[j].habitantes})\]
+\[wp(True \land 0 \leq i \leq |ciudades| \yLuego 0 \leq i \leq |ciudades| \yLuego res = ({\sum\limits_{j=0}^{i}ciudades[j].habitantes})-ciudades[i].habitantes\]
+\[wp(S,I)=(0 \leq i \leq |ciudades| \yLuego res = {\sum\limits_{j=0}^{i-1}ciudades[j].habitantes})\\\]
+\vspace{0.5cm}\\	
+
+C) $I \land \neg B \implica Qc$\\
+\[I \land \neg B \equiv 0 \leq i \leq |ciudades| \yLuego res ={\sum\limits_{j=0}^{i-1}ciudades[j].habitantes} \land i \geq |ciudades|\implica\]\\
+\[res = {\sum\limits_{j=0}^{i-1}ciudades[j].habitantes} \land i = |ciudades| \equiv res= {\sum\limits_{j=0}^{|ciudades|-1}ciudades[j].habitantes}\\ \\\]
+\[Por \ lo \ tanto, \ I\land \neg B \implica Qc\\ \vspace{0.5cm}\\\]
+
+Función variante propuesta: Fv = $|Ciudades|-i$ \\
+
+D)$\{I \land B \land Fv = V_0\} S \{Fv < V_0\} \Iff \{I \land B \land Fv = V_0\} \implica Wp (S, Fv < V_0 )\}$\\
+\[Wp(S,Fv < V_0 ) \equiv Wp(res:=res+ciudades[i].habitantes, i:=i+1,|ciudades|-i<V_0)\\ \]
+\[Wp(res:= res+ciudades[i].habitantes, Wp(i:=i+1,|ciudades|-1< V_0))\\\]
+\[\hspace{1cm}Wp(i:=i+1,|ciudades-1<V_0))  \]
+\[\hspace{1cm}\equiv def (i+1) \yLuego |ciudades|-(i+1) < V_0 )\]
+\[\hspace{1cm}\equiv def(i) \land def(1) \yLuego |ciudades|-i-1 < V_0 \]
+\[\hspace{1cm}\equiv 0 \leq i+1< |ciudades| \land True \yLuego |ciudades|-i-1 < V_0  \]
+\[\hspace{1cm}\equiv -1 \leq i < |ciudades| -1 \yLuego |ciudades|-i-1 < V_0  \\\]
+\[\equiv def(res+ciudades[i]) \yLuego (-1 \leq i < |ciudades -1 \yLuego |ciudades|-i-1 < V_0)\]
+\[\equiv True \land 0 \leq i < |ciudades| \yLuego (-1 \leq i < |ciudades -1 \yLuego |ciudades|-i-1 < V_0)\]
+\\
+
+$Obs: 0 \leq i \leq |ciudades| \yLuego -1 \leq i \leq |ciudades|-1 = 0 \leq i < |ciudades|$\\
+\[\equiv 0 \leq i < |ciudades| \yLuego |ciudades|-i-1 < V_0\]
+\[\equiv |ciudades| -i-1 < V_0\]
+\[\{I \land B \land V_0 = Fv\} \equiv \{0 \leq |ciudades| -1 \land |ciudades|-1 = V_0 \land {res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes}\}\]
+\[(I \land B \land V_0 = Fv) \implica Wp(S,Fv < V_0) \Iff |ciudades| -i-1 < |ciudades|-1 \Iff -1 < 0\] 
+\hspace{0.5cm}E) $I \land Fv \leq 0 \implica \neg B$\\
+\[I \land Fv \leq 0 \equiv (0 \leq i \leq |ciudades| \land |ciudades|-i \leq 0 \land {res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes}) \Iff\\\]
+\[ (0\leq i \leq |ciudades| \land |ciudades|\leq i) \Iff (i=|ciudades|) \implica \neg(i<|ciudades|) \equiv \neg B\] \\
+
+El ciclo termina, y es correcto \\
+\\
+Para demostrar que la implementación es correcta con respecto a la especificación, debo probar por monotonía que:\\ \\
+1)$ P\implicaLuego Pc$\\ \hspace{0.5cm}
+\[P \implica wp(res=0, wp(i=0, Pc))\]
+\[P \implica wp(res=0, res = 0 \land i = 0 \land (\existe[unalinea]i\ent {0\leq i<|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \land \\\]
+\[  \paraTodo[unalinea]i{\ent}{0 \leq i<|conexion|} \implicaLuego {(|ciudades|[i].habitantes \geq 0) } \land \]
+   \[ \paraTodo[unalinea]i{\ent}{\paraTodo[unalinea]j{\ent}{0 \leq i < j<ciudades[i].nombre \neq ciudades[j].nombre}}))\]
+\[P \implica res = 0 \land i = 0 \land (\existe[unalinea]i\ent {0\leq i<|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \land \\ \]
+\[ \paraTodo[unalinea]i{\ent}{0 \leq i<|conexion|} \implicaLuego {(|ciudades|[i].habitantes \geq 0) } \land \]
+ \[   \paraTodo[unalinea]i{\ent}{\paraTodo[unalinea]j{\ent}{0 \leq i < j<ciudades[i].nombre \neq ciudades[j].nombre}})\]
+
+Es verdadero ya que la precondición no implica ninguna condición adicional sobre res ni sobre i\\ \\
+2)$Pc \implicaLuego wp(while..., Qc)$ \\ \hspace{0.5cm}
+Fue demostrado anteriormente con los teoremas del invariante y de terminación \\ \\
+3)$ Qc \implicaLuego Q$\\ \hspace{0.5cm}
+Puesto que no hay código luego del ciclo, Qc \implica Q
+\[\equiv (i=|ciudades| \land res ={\sum\limits_{j=0}^{i-1}ciudades[j].habitantes})\implica res = {\sum\limits_{j=0}^{|ciudades|-1}ciudades[j].habitantes}\\\]
+
+\[Con \ esto\ queda\ demostrada\ la\ correctitud\ del\ programa\]
+\vspace{15cm}\\
+2. Demostrar que el valor devuelto es mayor a 50.000.
+\vspace{0.3cm}\\
+En el punto anterior, demostramos que, dada la implementación, es posible cumplir con la especificación propuesta. Sin embargo, esta no garantiza explícitamente que el valor de res sea mayor a 50,000. Entonces, ¿cómo podemos demostrarlo? Podemos afirmarlo gracias a la precondición, que establece que al menos una de las ciudades tiene más de 50,000 habitantes, y que además, el resto de las ciudades tienen habitantes con un valor mayor o igual a 0.\\ \\
+Asimismo, dado que el tipo de dato de ciudades es IN, las cantidades de habitantes no se modificarán durante la ejecución del programa, y este solo se limitará a sumar dichos valores a res, tal como lo establece la postcondición.\\ \\
+Por lo tanto, proponemos modificar la postcondición Q para asegurar que el valor de res sea mayor a 50,000. Esta modificación en Q conlleva, en consecuencia, un ajuste en nuestro invariante y en la Qc, que ahora deben reflejar la existencia de al menos una ciudad con más de 50,000 habitantes ($ciudades[j].habitantes > 50000$). De esta manera, podemos garantizar que la implementación cumple con la nueva especificación requerida y que, al finalizar el ciclo, el valor de res será mayor a 50,000. \\ \\
+Dado que en el punto anterior se probó la monotonía del código y la modificación en la postcondición fortalece la misma, la correctitud del programa no se ve afectada. Según el Principio de Sustitución de Liskov y el Design by Contracts, cualquier cambio que fortalezca la postcondición y mantenga o debilite la precondición no impacta en la corrección del código. Por lo tanto, esta modificación es válida.
+
+
+\[Pc = \{ res = 0 \land i = 0 \land (\existe[unalinea]i\ent {0\leq i<|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \land \\ \paraTodo[unalinea]i{\ent}{0 \leq i<|conexion|} \] \[ \implicaLuego {(|ciudades|[i].habitantes \geq 0) } \land
+   \paraTodo[unalinea]i{\ent}{\paraTodo[unalinea]j{\ent}{0 \leq i < j<ciudades[i].nombre \neq ciudades[j].nombre}})\}   \] \\
+$B = \{{i< |ciudades|}\} $ \\
+$Fv = {|ciudades| - i}$ \\
+\[I = \{{ 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes \land \existe[unalinea]j{\ent}{0\leq j <|ciudades| \yLuego |ciudades|[j].habitantes > 50,000}}\}\]\\
+Qc = $\{{res = \sum\limits_{i=0}^{|ciudades|-1}ciudades[j].habitantes \land res>50000}\}$\\ \\ \\
+
+A) Pc \implica I \\
+\[0\leq i \leq |ciudades| \equiv 0\leq 0 \leq |ciudades|\]
+\[res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes \equiv 0 \equiv res = \sum\limits_{j=0}^{0-1}ciudades[j].habitantes = 0 \]
+\[Luego,\]
+\[\existe [unalinea]i{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes >5000} = \]
+\[\existe [unalinea]j{\ent}{0 \leq j < |ciudades| \yLuego ciudades[j].habitantes >5000}  \]
+\[por \ lo \ tanto, \ PC \implica I \] \\
+
+
+B)$\{I \land B \} S \{I\}$ \vspace{0.2cm}: Quedó demostrado por Monotonía en el punto anterior. \\
+Este nuevo componente existencial dentro del invariante garantiza que, dentro del conjunto de las ciudades, exista al menos una ciudad cuyo número de habitantes sea mayor que cero. Al aplicar esta modificación, observamos que, al realizar la implicación en los pasos subsiguientes, este nuevo componente no afecta el resultado final del cálculo del WP.
+\[wp(S,I)=(0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes \ \yLuego \]
+ \[\existe [unalinea]i{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes >5000} )\\\]
+
+
+C) $I \land \neg B \implica Qc$\\
+	\[I \land \neg B \equiv 0\leq i \leq |ciudades| \ \land \ res = \sum\limits_{j=0}^{i-1}ciudades[j].habitantes \  \land \  \existe[unalinea]j{\ent}{0\leq j <|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \]
+	\[ \land \ i \geq |ciudades| \implica i=|ciudades| \equiv \]
+	\[res= \sum\limits_{j=0}^{|ciudades|-1}ciudades[j].habitantes \ \land \ \existe[unalinea]j{\ent}{0\leq j <|ciudades| \yLuego |ciudades|[i].habitantes > 50,000} \equiv \]
+	\[res = ciudades[0].habitantes+...+ciudades[j-1].habitantes+ciudades[j].habitantes+ciudades[j+1].habitantes+...\]
+	\[+ciudades[|ciudades|-1] \ \land  \ \existe[unalinea]j{\ent}{0\leq j <|ciudades| \yLuego |ciudades|[i].habitantes > 50,000}  \implica \]
+	\[res >50000\]
+	\[Y \ como \ res= \sum\limits_{j=0}^{|ciudades|-1}ciudades[j].habitantes \ \land \ res>50000, queda \ demostrado \ que \ I \land \neg B \implica Qc   \] \\
+
+D)$\{I \land B \land Fv = V_0\} S \{Fv < V_0\} \Iff \{I \land B \land Fv = V_0\} \implica Wp (S, Fv < V_0 )\}$\\ La modificación del invariante no cambia la demostración con respecto al punto anterior, puesto a que el componente existencial no guarda relación con la terminación del ciclo. \\
+
+E) $I \land Fv \leq 0 \implica \neg B$\\ La modificación del invariante no cambia la demostración con respecto al punto anterior, puesto a que el componente existencial no guarda relación con la negación de la guarda.
+
+Obs: El punto 1 de la monotonía no se vé afectado por las nuevas condiciones agregadas
+
+3) \[Qc \implicaLuego Q\]
+Puesto que no hay codigo luego del ciclo, Qc \implica Q 
+\[\equiv (i=|ciudades| \land res ={\sum\limits_{j=0}^{i-1}ciudades[j].habitantes}) \land res>50000 \implica res = {\sum\limits_{j=0}^{|ciudades|-1}ciudades[j].habitantes} \land res>50000\\\]
+
+\[Con\ esto\ queda\ demostrada\ la\ correctitud\ del\ programa\ y\ que\ res\ va\ a\ ser\ mayor\ a\ 50000.\]
+
+
+\end{document}
