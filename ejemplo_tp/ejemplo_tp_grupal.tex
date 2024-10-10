@@ -24,22 +24,29 @@
 \maketitle{}
 \section{Especificación}
 \subsection*{Predicados de uso general}
-\pred{tieneHabitantes}{ciudad:\TLista{Ciudad}}{ciudad.habitantes\geq 0}
-\pred{tieneCamino}{distancias:\TLista{\TLista{\ent}}, desde:\ent , hasta:\ent  }{\existe[unalinea]{lista}{\TLista{\ent}}{\paraTodo[unalinea]{i}{\ent}{1\leq i< |lista| \implicaLuego ((lista[0]=desde)\land(lista[|lista|-1]=hasta)\\ \land(distancias[lista[i]][lista[i-1]]>0)\land \paraTodo[unalinea]{a}{\ent}{0\leq a<|lista| \implicaLuego 0 \leq lista[a] < |distancias|) }}}}
+\pred{tieneHabitantes}{ciudad:{Ciudad}}{ciudad.habitantes\geq 0}
 
-\pred{esSimetrica}{matriz: \TLista{\TLista{\ent}}}{\paraTodo [unalinea]{i}{\ent}{0\leq i < |matriz| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0\leq j<|matriz[j]|\implicaLuego matriz[i][j] = matriz[j][i]}}}
+\pred{noTieneRepetidos}{secuencia1:\TLista{Ciudad}}{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|secuencia1| \implicaLuego \neg \existe [unalinea]{j}{\ent}{0 \leq j<|secuencia1| \land i\neq j \yLuego \\ secuencia1[i] = secuencia1[j]}}} 
+
+\pred{tieneCamino}{distancias:\TLista{\TLista{\ent}}, desde:\ent , hasta:\ent  }
+{\existe[unalinea]{lista}{\TLista{\ent}}{(|lista| > 1) \land \paraTodo[unalinea]{i}{\ent}{1\leq i< |lista| \implicaLuego ((lista[0]=desde)\land(lista[|lista|-1]=hasta) \land \\ \paraTodo[unalinea]{a}{\ent}{0\leq a<|lista| \implicaLuego 0 \leq lista[a] < |distancias|)\yLuego (distancias[lista[i]][lista[i-1]]>0) }}}}
+
+\pred{esSimetrica}{matriz: \TLista{\TLista{\ent}}}{\paraTodo [unalinea]{i}{\ent}{0\leq i < |matriz| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0\leq j<|matriz|\implicaLuego matriz[i][j] = matriz[j][i]}}}
 
 \pred{esCuadrada}{matriz: \TLista{\TLista{\ent}}}{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|matriz| \implicaLuego |matriz| = |matriz[i]|}}
+
+\pred{diagonalEnCero}{matriz: \TLista{\TLista{\ent}}}{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matriz| \implicaLuego matriz[i][i]=0}}
 
 \subsection {grandesCiudades}
 A partir de una lista de ciudades, devuelve aquellas que tienen más de 50.000 habitantes.
 \vspace{0.2cm}
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad} }{\TLista{Ciudad}}
 	\requiere{\paraTodo[unalinea]{i}{\ent}{0\leq i < |ciudades| \implicaLuego tieneHabitantes(ciudades[i])}}
+    \requiere{noTieneRepetidos(ciudades)}
 	\asegura{\paraTodo [unalinea]{a}{\ent}{0 \leq a<|res| \implicaLuego (res[a]  \in  ciudades)}}
-	\asegura{\paraTodo [unalinea]{j}{\ent}{0 \leq j<|ciudades| \yLuego tieneMasDe50k(ciudades[j])  \implicaLuego ciudades[j])  \in  res}}
-	
-	
+	\asegura{\paraTodo [unalinea]{j}{\ent}{0 \leq j<|ciudades| \yLuego tieneMasDe50k(ciudades[j])  \implicaLuego ciudades[j]  \in  res}}
+	\asegura{noTieneRepetidos(res)}
+
 	\vspace{0.2cm}
 	
 \end{proc}
@@ -58,17 +65,16 @@ con la cantidad total de sus habitantes.
 	\requiere{\paraTodo[unalinea]{i}{\ent}{0\leq i < |menoresDeCiudades| \implicaLuego tieneHabitantes(menoresDeCiudades[i]) \land \\ 			tieneHabitantes(mayoresDeCiudades[i]) }}
 
 	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|menoresDeCiudades| \implicaLuego \existe [unalinea]{j}{\ent}{0 \leq j<|mayoresDeCiudades| \yLuego 	\\		             menoresDeCiudades[i].nombre = mayoresDeCiudades[j].nombre}}}
-\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|mayoresDeCiudades| \implicaLuego \existe [unalinea]{j}{\ent}{0 \leq j<|menoresDeCiudades| \yLuego 	\\		             mayoresDeCiudades[i].nombre = menoresDeCiudades[j].nombre}}}
+
 	\asegura{mismoLargo(res, menoresDeCiudades) \land (\paraTodo [unalinea]{a}{\ent}{0 \leq a<|menoresDeCiudades| \implicaLuego \\ \existe [unalinea]{b}{\ent}{0 \leq b<|res| \yLuego 			             res[b].nombre = menoresDeCiudades[a].nombre)}}}
-	\asegura{\paraTodo [unalinea]{m}{\ent}{0 \leq m<|menoresDeCiudades| \implicaLuego \existe [unalinea]{n}{\ent}{0 \leq n<|mayoresDeCiudades|   \ \yLuego 			             menoresDeCiudades[m].nombre = mayoresDeCiudades[n].nombre \ \yLuego \\\ agruparHabitantes(menoresDeCiudades[m], mayoresDeCiudades[n]) \in res}}}
+	\asegura{\paraTodo [unalinea]{m}{\ent}{0 \leq m<|menoresDeCiudades| \implicaLuego \existe [unalinea]{n}{\ent}{0 \leq n<|mayoresDeCiudades|   \ \yLuego 			             menoresDeCiudades[m].nombre = mayoresDeCiudades[n].nombre \ \land \\\ agruparHabitantes(menoresDeCiudades[m], mayoresDeCiudades[n]) \in res}}}
 	\vspace{0.3cm}
 
 
 \end{proc}
 	\pred{mismoLargo}{secuencia1:\TLista{Ciudad}, secuencia2:\TLista{Ciudad} }{|secuencia1|=|secuencia2|} 
-\vspace{0.2cm}
-\pred{noTieneRepetidos}{secuencia1:\TLista{Ciudad}}{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|secuencia1| \implicaLuego \neg \existe [unalinea]{j}{\ent}{0 \leq j<|secuencia1| \land i\neq j \yLuego \\ secuencia1[i] = secuencia1[j]}}} 
-\vspace{0.2cm}
+
+	\vspace{0.2cm}
 \aux{agruparHabitantes}{menoresDeCiudades: \ensuremath{Ciudad \langle String, \ent \rangle},mayoresDeCiudades:\ensuremath{Ciudad \langle String, \ent \rangle}  }{\ensuremath{Ciudad \langle String, \ent \rangle} \\}{\langle menoresDeCiudades.nombre, (menoresDeCiudades.habitantes+mayoresDeCiudades.habitantes)\rangle}
 	\vspace{0.2cm}
 \subsection {hayCamino}
@@ -79,9 +85,9 @@ la distancia de una ciudad hacia sí misma es cero y la distancia entre A y B es
 Dadas dos ciudades y una matriz de distancias, se pide determinar si existe un camino entre ambas ciudades.
 \vspace{0.2cm}
 \begin{proc}{hayCamino}{\In distancias: \TLista{\TLista{\ent}}, \In desde:\ent , \In hasta:\ent }{Bool}
-	\requiere{|distancias|\geq2}
 	\requiere{esCuadrada(distancias)}
 	\requiere{esSimetrica(distancias)}
+	\requiere{diagonalEnCero(distancias)}
 	\requiere{0\leq desde < |distancias| \land 0 \leq hasta < |distancias|}
 	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|distancias| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|distancias[i]| \implicaLuego 	\\		             (distancias[i][j] \geq0)}}}
 	\asegura{res = True \Iff tieneCaminoDirecto(distancia, desde, hasta) \lor tieneCamino(distancia, desde, hasta)}
@@ -109,16 +115,20 @@ misma nos da la matriz de conexión de orden 2, y así sucesivamente.
 \vspace{0.3cm}
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexion: \TLista{\TLista{\ent}}, \In n:\ent }{}
 	\requiere{|conexion|\geq2 \land conexion=conexion_0}
-	\requiere{n>1}
+	\requiere{n \geq 1}
 	\requiere{esCuadrada(conexion)}
 	\requiere{esSimetrica(conexion)}
+	\requiere{diagonalEnCero(conexion)}
 	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|conexion| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|conexion[i]| \implicaLuego 	\\		             (conexion[i][j] \in \{0,1\})}}}
-	\asegura{\existe[unalinea]{listaMatrices}{\TLista{\TLista{\TLista{\ent}}}}{(|listaMatrices|=n)\land \paraTodo [unalinea]{q}{\ent}{1\leq q < |ListaMatrices| \implicaLuego     \\   (|listaMatrices[q]| = |conexion_0|) \land (listaMatrices[0] = conexion_0) \land \paraTodo[unalinea]{i}{\ent}{0\leq i<|conexion_0| \implicaLuego      \\       \paraTodo[unalinea]{j}{\ent}{0\leq j <|conexion_0| \implicaLuego listaMatrices[q] = \sum\limits_{k=0}^{|conexion_0|-1} conexion_0[k][i] * listaMatrices[q-1][j][k] }} }} \land \paraTodo[unalinea]{a}{\ent}{0\leq a<|conexion| \implicaLuego \paraTodo[unalinea]{b}{\ent}{0\leq b<|conexion| \implicaLuego conexion[a][b]=listaMatrices[n-1][a][b]}}}
+	\asegura{\existe[unalinea]{listaMatrices}{\TLista{\TLista{\TLista{\ent}}}}{(|listaMatrices|=n)\land \paraTodo [unalinea]{q}{\ent}{1\leq q < |ListaMatrices| \implicaLuego     \\  (listaMatrices[0] = conexion_0) \land (|listaMatrices[q]| = |conexion_0|) \land esCuadrada(listaMatrices[q]) \land \\ conexion = listaMatrices[n-1]}}}
 
 
 	\vspace{0.2cm}
 	
 \end{proc}
+
+\pred{m1EsM2PorM2}{listaMatrices:\TLista{\TLista{\TLista{\ent}}}}{\paraTodo[unalinea]{i}{\ent}{1 \leq i < |listaMatrices| \implicaLuego listaMatrices[i] = listaMatrices[i-1] * listaMatrices[0] }}
+
 \subsection {caminoMínimo}
 Dada una matriz de distancias, una ciudad de origen y una ciudad de destino, este procedimiento
 debe devolver la lista de ciudades que conforman el camino con menor distancia entre ambas. En caso de no existir un
@@ -128,18 +138,19 @@ camino, se debe devolver una lista vacía.
 \begin{proc}{caminoMínimo}{\In distancias: \TLista{\TLista{\ent}}, \In origen:\ent , \In destino:\ent }{\TLista{\TLista{\ent}}}
 	\requiere{esCuadrada(distancias)}
 	\requiere{esSimetrica(distancias)}
+	\requiere{diagonalEnCero(conexion)}
 	\requiere{\paraTodo [unalinea]{i}{\ent}{0 \leq i<|distancias| \implicaLuego \paraTodo [unalinea]{j}{\ent}{0 \leq j<|distancias[i]| \implicaLuego 	\\		             (distancias[i][j] \geq0)}}}
 	\requiere{0\leq origen < |distancias| \land 0 \leq destino < |distancias|}
 
 	\asegura{res = [] \Iff  \neg tieneCamino(distancias, origen, destino)}
-	\asegura{res = lista \Iff  \existe[unalinea]{lista}{\TLista{\ent}}{esCamino(distancias, lista, origen, destino)\land \\ \paraTodo [unalinea]{listaAux}{\TLista{\ent}} {esCamino(distancias, listaAux, origen, destino) \implicaLuego \\ \sum\limits_{k=1}^{|lista|-1} distancias[lista[i]][lista[i-1]] \leq 	\sum\limits_{k=1}^{|listaAux|-1} distancias[listaAux[i]][listaAux[i-1]]   }} }
+	\asegura{\existe[unalinea]{lista}{\TLista{\ent}}{esCamino(distancias, lista, origen, destino)\land \\ \paraTodo [unalinea]{listaAux}{\TLista{\ent}} {esCamino(distancias, listaAux, origen, destino) \implicaLuego \\ \sum\limits_{k=1}^{|lista|-1} distancias[lista[k]][lista[k-1]] \leq 	\sum\limits_{k=1}^{|listaAux|-1} distancias[listaAux[k]][listaAux[k-1]] }\land res = lista} }
 
 
 	\vspace{0.2cm}
 	
 \end{proc}
-\pred{esCamino}{distancias: \TLista{\TLista{\ent}}, lista:\TLista{\ent}, origen:\ent , destino: \ent}{tieneCamino(distancias, origen, destino) \land \paraTodo [unalinea]{i}{\ent}{1\leq i<|lista| \implicaLuego distancia[lista[i]][lista[i-1]]>0}\land origen = lista[0]) \land (destino = lista [|lista|-1])}
-
+\pred{esCamino}{distancias: \TLista{\TLista{\ent}}, lista:\TLista{\ent}, origen:\ent , destino: \ent}{tieneCamino(distancias, origen, destino) \land \paraTodo[unalinea]{j}{\ent}{
+0\leq j<|lista| \implicaLuego lista[j] < |distancias|} \yLuego \\ \paraTodo [unalinea]{i}{\ent}{1\leq i<|lista| \implicaLuego distancias[lista[i]][lista[i-1]]>0}\land (origen = lista[0]) \land (destino = lista [|lista|-1])}
 
 
 \section{Demostraciones de Correctitud}
